@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% block title %}Trading Desk · Roles{% endblock %}
+{% block header %}Trading Desk{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+  
+  <!-- Trading Desk Header -->
+  <div class="card">
+    <div class="flex flex-col md:flex-row md:items-center gap-4 justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center shadow-lg">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-white">Trading Desk</h1>
+          <p class="text-slate-400">Manage and monitor trades</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        {% if can_create %}
+        <a href="{% url 'dashboard:trade_create' %}" class="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          New Trade
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="card">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+          <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-slate-400">Total Trades</p>
+          <p class="text-lg font-semibold text-white">{{ total_trades }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
+          <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-slate-400">Pending</p>
+          <p class="text-lg font-semibold text-white">{{ pending_trades }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+          <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-slate-400">Confirmed</p>
+          <p class="text-lg font-semibold text-white">{{ confirmed_trades }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+          <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-slate-400">Approved</p>
+          <p class="text-lg font-semibold text-white">{{ approved_trades }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card">
+    <div class="flex flex-wrap gap-2">
+      <a href="{% url 'dashboard:trades' %}" class="px-3 py-1.5 rounded-lg text-sm transition-colors {% if not status_filter %}bg-white/20 text-white{% else %}bg-white/5 text-slate-400 hover:bg-white/10{% endif %}">
+        All
+      </a>
+      <a href="{% url 'dashboard:trades' %}?status=PENDING" class="px-3 py-1.5 rounded-lg text-sm transition-colors {% if status_filter == 'PENDING' %}bg-yellow-500/20 text-yellow-300{% else %}bg-white/5 text-slate-400 hover:bg-white/10{% endif %}">
+        Pending
+      </a>
+      <a href="{% url 'dashboard:trades' %}?status=CONFIRMED" class="px-3 py-1.5 rounded-lg text-sm transition-colors {% if status_filter == 'CONFIRMED' %}bg-blue-500/20 text-blue-300{% else %}bg-white/5 text-slate-400 hover:bg-white/10{% endif %}">
+        Confirmed
+      </a>
+      <a href="{% url 'dashboard:trades' %}?status=APPROVED" class="px-3 py-1.5 rounded-lg text-sm transition-colors {% if status_filter == 'APPROVED' %}bg-green-500/20 text-green-300{% else %}bg-white/5 text-slate-400 hover:bg-white/10{% endif %}">
+        Approved
+      </a>
+      <a href="{% url 'dashboard:trades' %}?status=REJECTED" class="px-3 py-1.5 rounded-lg text-sm transition-colors {% if status_filter == 'REJECTED' %}bg-red-500/20 text-red-300{% else %}bg-white/5 text-slate-400 hover:bg-white/10{% endif %}">
+        Rejected
+      </a>
+    </div>
+  </div>
+
+  <!-- Trades Table -->
+  <div class="card">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-white/10">
+            <th class="text-left py-3 px-4 text-sm font-medium text-slate-300">Trade</th>
+            <th class="text-left py-3 px-4 text-sm font-medium text-slate-300">Type</th>
+            <th class="text-left py-3 px-4 text-sm font-medium text-slate-300">Quantity</th>
+            <th class="text-left py-3 px-4 text-sm font-medium text-slate-300">Price</th>
+            <th class="text-left py-3 px-4 text-sm font-medium text-slate-300">Total Value</th>
+            <th class="text-left py-3 px-4 text-sm font-medium text-slate-300">Status</th>
+            <th class="text-left py-3 px-4 text-sm font-medium text-slate-300">Created By</th>
+            <th class="text-left py-3 px-4 text-sm font-medium text-slate-300">Created</th>
+            <th class="text-left py-3 px-4 text-sm font-medium text-slate-300">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5">
+          {% for trade in trades %}
+            <tr class="hover:bg-white/5">
+              <td class="py-3 px-4">
+                <a href="{% url 'dashboard:trade_detail' trade.id %}" class="text-cyan-300 hover:text-cyan-200 font-medium">
+                  {{ trade.symbol }}
+                </a>
+              </td>
+              <td class="py-3 px-4">
+                <span class="px-2 py-1 rounded text-xs font-medium {% if trade.trade_type == 'BUY' %}bg-green-500/20 text-green-300{% else %}bg-red-500/20 text-red-300{% endif %}">
+                  {{ trade.trade_type }}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-slate-300">{{ trade.quantity|floatformat:0 }}</td>
+              <td class="py-3 px-4 text-slate-300">${{ trade.price|floatformat:2 }}</td>
+              <td class="py-3 px-4 text-slate-300 font-medium">${{ trade.total_value|floatformat:2 }}</td>
+              <td class="py-3 px-4">
+                <span class="px-2 py-1 rounded text-xs font-medium bg-{{ trade.status_color }}-500/20 text-{{ trade.status_color }}-300">
+                  {{ trade.status }}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-slate-300">{{ trade.created_by.username }}</td>
+              <td class="py-3 px-4 text-slate-400 text-sm">{{ trade.created_at|date:"M d, H:i" }}</td>
+              <td class="py-3 px-4">
+                <div class="flex items-center gap-2">
+                  {% if can_confirm and trade.can_be_confirmed %}
+                    <a href="{% url 'dashboard:trade_confirm' trade.id %}" class="text-blue-400 hover:text-blue-300 text-sm">Confirm</a>
+                  {% endif %}
+                  {% if can_approve and trade.can_be_approved %}
+                    <a href="{% url 'dashboard:trade_approve' trade.id %}" class="text-green-400 hover:text-green-300 text-sm">Approve</a>
+                  {% endif %}
+                  <a href="{% url 'dashboard:trade_detail' trade.id %}" class="text-slate-400 hover:text-slate-300 text-sm">View</a>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="9" class="py-8 text-center text-slate-500">
+                No trades found.
+                {% if can_create %}
+                  <a href="{% url 'dashboard:trade_create' %}" class="text-violet-400 hover:text-violet-300 ml-1">Create your first trade</a>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="flex items-center justify-between pt-4 border-t border-white/10">
+      <div class="text-sm text-slate-400">
+        Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} trades
+      </div>
+      <div class="flex items-center gap-2">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-3 py-1 rounded bg-white/5 hover:bg-white/10 text-sm">Previous</a>
+        {% endif %}
+        <span class="px-3 py-1 text-sm text-slate-300">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="px-3 py-1 rounded bg-white/5 hover:bg-white/10 text-sm">Next</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- User Permissions Info -->
+  <div class="card">
+    <h3 class="text-lg font-medium text-white mb-3">Your Permissions</h3>
+    <div class="flex flex-wrap gap-2">
+      <span class="px-3 py-1 rounded-full bg-slate-700/50 text-slate-300 text-sm">View Trades</span>
+      {% if can_create %}
+        <span class="px-3 py-1 rounded-full bg-violet-500/20 text-violet-300 text-sm">Create Trades</span>
+      {% endif %}
+      {% if can_confirm %}
+        <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-sm">Confirm Trades</span>
+      {% endif %}
+      {% if can_approve %}
+        <span class="px-3 py-1 rounded-full bg-green-500/20 text-green-300 text-sm">Approve Trades</span>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}403 - Access Forbidden{% endblock %}
+
+{% block header %}Oops! Access Denied{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8">
+  <!-- Cute Cat Illustration -->
+  <div class="relative">
+    <div class="w-48 h-48 mx-auto">
+      <!-- Cat body -->
+      <div class="relative bg-gradient-to-br from-orange-400 to-orange-500 rounded-full w-32 h-32 mx-auto shadow-2xl">
+        <!-- Cat stripes -->
+        <div class="absolute top-4 left-4 w-6 h-1 bg-orange-600 rounded-full transform -rotate-12"></div>
+        <div class="absolute top-6 right-6 w-4 h-1 bg-orange-600 rounded-full transform rotate-12"></div>
+        <div class="absolute bottom-8 left-6 w-5 h-1 bg-orange-600 rounded-full transform -rotate-6"></div>
+        
+        <!-- Cat ears -->
+        <div class="absolute -top-4 left-8 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[20px] border-b-orange-500"></div>
+        <div class="absolute -top-4 right-8 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[20px] border-b-orange-500"></div>
+        
+        <!-- Inner ears -->
+        <div class="absolute -top-2 left-10 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-pink-400"></div>
+        <div class="absolute -top-2 right-10 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-pink-400"></div>
+        
+        <!-- Cat face -->
+        <div class="absolute top-8 left-1/2 transform -translate-x-1/2 space-y-2">
+          <!-- Eyes (grumpy/annoyed expression) -->
+          <div class="flex space-x-4 justify-center">
+            <div class="w-3 h-2 bg-slate-800 rounded-full transform rotate-12"></div>
+            <div class="w-3 h-2 bg-slate-800 rounded-full transform -rotate-12"></div>
+          </div>
+          
+          <!-- Nose -->
+          <div class="mx-auto w-2 h-2 bg-pink-500 rounded-full transform rotate-45 shadow-sm"></div>
+          
+          <!-- Mouth (frown) -->
+          <div class="mx-auto w-4 h-2 border-b-2 border-slate-800 rounded-b-full transform rotate-180"></div>
+        </div>
+      </div>
+      
+      <!-- Cat paws blocking access -->
+      <div class="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
+        <div class="flex space-x-2">
+          <div class="w-8 h-6 bg-orange-400 rounded-full shadow-lg"></div>
+          <div class="w-8 h-6 bg-orange-400 rounded-full shadow-lg"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Stop sign held by cat -->
+    <div class="absolute -right-8 top-12">
+      <div class="w-16 h-16 bg-red-500 transform rotate-45 flex items-center justify-center shadow-xl border-4 border-red-600">
+        <span class="text-white font-bold text-xs transform -rotate-45">STOP</span>
+      </div>
+      <!-- Stop sign pole -->
+      <div class="w-1 h-12 bg-gray-600 mx-auto"></div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div class="space-y-4 max-w-2xl">
+    <h1 class="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-pink-400">
+      403
+    </h1>
+    
+    <h2 class="text-3xl font-bold text-slate-200">
+      Paws Off! 🐾
+    </h2>
+    
+    <div class="space-y-3 text-slate-300">
+      <p class="text-xl">
+        This cat is <span class="text-orange-400 font-semibold">not amused</span> by your attempted access!
+      </p>
+      
+      <p class="text-lg leading-relaxed">
+        You've stumbled into restricted territory. This feline guardian takes security 
+        <span class="italic">very</span> seriously, and your current role doesn't grant you 
+        the necessary permissions to proceed.
+      </p>
+      
+      <div class="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-6 text-left">
+        <h3 class="text-lg font-semibold text-orange-400 mb-3 flex items-center">
+          <span class="mr-2">🛡️</span>
+          What happened?
+        </h3>
+        <ul class="space-y-2 text-sm text-slate-400">
+          <li class="flex items-start">
+            <span class="text-red-400 mr-2">•</span>
+            <span>You tried to access a resource that requires specific permissions</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-red-400 mr-2">•</span>
+            <span>Your current role: <code class="bg-slate-700 px-2 py-1 rounded text-cyan-300">{{ user.roles|join:", "|default:"No roles assigned" }}</code></span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-red-400 mr-2">•</span>
+            <span>The security cat has been notified (and is plotting your demise)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex flex-col sm:flex-row gap-4 mt-8">
+    <a href="/" 
+       class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-2">
+      <span>🏠</span>
+      <span>Go Home (Safe Zone)</span>
+    </a>
+    
+    <a href="/profile/" 
+       class="px-6 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-2">
+      <span>👤</span>
+      <span>Check My Roles</span>
+    </a>
+    
+    <button onclick="window.history.back()" 
+            class="px-6 py-3 bg-slate-700 text-slate-200 font-semibold rounded-xl shadow-lg hover:bg-slate-600 transform hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-2">
+      <span>↩️</span>
+      <span>Go Back</span>
+    </button>
+  </div>
+
+  <!-- Funny Footer -->
+  <div class="mt-12 text-slate-500 text-sm text-center max-w-md">
+    <p class="italic">
+      "In case of emergency, try bribing the cat with tuna. Results may vary." 🐟
+    </p>
+    <p class="mt-2 text-xs">
+      Error Code: CAT-403-GRUMPY | Time: <span id="current-time"></span>
+    </p>
+  </div>
+</div>
+
+<!-- Floating particles for extra cuteness -->
+<div class="fixed inset-0 pointer-events-none overflow-hidden">
+  <div class="absolute top-1/4 left-1/4 w-2 h-2 bg-orange-400 rounded-full opacity-20 animate-pulse"></div>
+  <div class="absolute top-1/3 right-1/3 w-1 h-1 bg-pink-400 rounded-full opacity-30 animate-bounce"></div>
+  <div class="absolute bottom-1/4 left-1/3 w-3 h-3 bg-cyan-400 rounded-full opacity-10 animate-ping"></div>
+  <div class="absolute top-1/2 right-1/4 w-2 h-2 bg-violet-400 rounded-full opacity-15 animate-pulse" style="animation-delay: 1s;"></div>
+</div>
+
+<script>
+  // Update current time
+  function updateTime() {
+    const now = new Date();
+    document.getElementById('current-time').textContent = now.toLocaleTimeString();
+  }
+  updateTime();
+  setInterval(updateTime, 1000);
+  
+  // Add some cat sound effects when clicking on the cat (just for fun)
+  document.querySelector('.rounded-full.w-32.h-32').addEventListener('click', function() {
+    // Create a temporary audio context for a "meow" sound effect
+    // This is a simple beep that sounds vaguely cat-like
+    if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+      const AudioContextClass = AudioContext || webkitAudioContext;
+      const audioContext = new AudioContextClass();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+    }
+    
+    // Add a little shake animation
+    this.style.animation = 'shake 0.5s ease-in-out';
+    setTimeout(() => {
+      this.style.animation = '';
+    }, 500);
+  });
+</script>
+
+<style>
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+</style>
+{% endblock %}

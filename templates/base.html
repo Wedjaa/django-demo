@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  {% load static %}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Dashboard{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+  {% if debug %}<script src="http://localhost:35729/livereload.js?snipver=1"></script>{% endif %}
+  {% block head %}{% endblock %}
+  <style>
+    .avatar-img{object-fit:cover;display:block;}
+    #userMenu{pointer-events:auto;}
+    #userMenu .avatar-img{width:40px;height:40px;}
+  </style>
+</head>
+<body class="h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100 antialiased">
+  <div id="app" class="min-h-full flex">
+    <aside class="w-64 hidden md:flex flex-col backdrop-blur bg-white/5 border-r border-white/10">
+      <div class="h-16 flex items-center px-6 text-xl font-semibold tracking-tight">⚡ Roles</div>
+      <nav class="flex-1 px-4 space-y-2 overflow-y-auto py-4">
+        <a href="/" class="group flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 group-hover:scale-125 transition-transform"></span>
+          <span class="text-sm font-medium">Overview</span>
+        </a>
+        <a href="/profile/" class="group flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition">
+          <span class="w-2 h-2 rounded-full bg-cyan-400 group-hover:scale-125 transition-transform"></span>
+          <span class="text-sm font-medium">Profile</span>
+        </a>
+        <a href="/trades/" class="group flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition">
+          <span class="w-2 h-2 rounded-full bg-violet-400 group-hover:scale-125 transition-transform"></span>
+          <span class="text-sm font-medium">Trading Desk</span>
+        </a>
+        {% if 'admin' in user_roles %}
+        <a href="/administration/" class="group flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition">
+          <span class="w-2 h-2 rounded-full bg-red-400 group-hover:scale-125 transition-transform"></span>
+          <span class="text-sm font-medium">Admin Panel</span>
+        </a>
+        {% endif %}
+      </nav>
+      <div class="p-4 text-xs text-slate-400">&copy; {% now 'Y' %} Roles Dashboard</div>
+    </aside>
+    <div class="flex-1 flex flex-col">
+      <header class="h-16 flex items-center px-4 md:px-6 border-b border-white/10 backdrop-blur bg-white/5">
+        <div class="flex-1 flex items-center gap-4 min-w-0">
+          <button class="md:hidden p-2 rounded-lg hover:bg-white/10" id="menuBtn">☰</button>
+          <h1 class="text-lg font-semibold truncate">{% block header %}Overview{% endblock %}</h1>
+        </div>
+        <div class="relative shrink-0" id="userMenuWrapper">
+          <button id="userMenuBtn" class="h-9 w-9 rounded-full ring-2 ring-white/20 overflow-hidden flex items-center justify-center bg-gradient-to-br from-emerald-400 to-cyan-400 text-slate-900 font-semibold focus:outline-none focus:ring-4 focus:ring-emerald-400/40">
+            {% if oidc_user_picture %}
+              <img src="{{ oidc_user_picture }}" alt="avatar" class="avatar-img" referrerpolicy="no-referrer" />
+            {% else %}
+              {{ request.user.username|default:'?'|slice:':1'|upper }}
+            {% endif %}
+          </button>
+          <div id="userMenu" class="hidden absolute top-full mt-2 right-0 w-56 max-w-[calc(100vw-1rem)] rounded-xl border border-white/10 bg-slate-800/90 backdrop-blur shadow-lg shadow-black/40 p-2 animate-fade-in z-50">
+            <div class="px-3 py-2 flex items-center gap-3">
+              <div class="h-10 w-10 rounded-full overflow-hidden ring-2 ring-white/10 bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center">
+                {% if oidc_user_picture %}
+                  <img src="{{ oidc_user_picture }}" alt="avatar" class="avatar-img" referrerpolicy="no-referrer" />
+                {% else %}
+                  <span class="font-semibold text-slate-900">{{ request.user.username|default:'?'|slice:':1'|upper }}</span>
+                {% endif %}
+              </div>
+              <div class="min-w-0">
+                <p class="text-sm font-medium truncate">{{ request.user.get_full_name|default:request.user.username }}</p>
+                <p class="text-xs text-slate-400 truncate">{{ request.user.email }}</p>
+              </div>
+            </div>
+            <div class="my-2 h-px bg-white/10"></div>
+            <a href="/profile/" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-white/10">Profile</a>
+            {% if 'admin' in user_roles %}
+            <a href="/administration/" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-white/10 text-red-300">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+              </svg>
+              Admin Panel
+            </a>
+            {% endif %}
+            <form method="post" action="/logout/" class="mt-1">{% csrf_token %}
+              <button class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-white/10 text-left" type="submit">Logout</button>
+            </form>
+          </div>
+        </div>
+      </header>
+      <main class="flex-1 p-6 space-y-6">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+  <script>
+    (function(){
+      const btn = document.getElementById('userMenuBtn');
+      const menu = document.getElementById('userMenu');
+      if(!btn || !menu) return;
+      let inBody = false;
+      function ensurePortal(){
+        if(inBody) return;
+        document.body.appendChild(menu); // move to body top level
+        menu.style.position='fixed';
+        menu.style.width='14rem'; // ~ w-56
+        menu.style.maxWidth='90vw';
+        menu.classList.add('z-[1000]');
+        inBody = true;
+      }
+      function position(){
+        if(menu.classList.contains('hidden')) return;
+        ensurePortal();
+        const r = btn.getBoundingClientRect();
+        const mw = menu.offsetWidth || 224;
+        let left = r.right - mw; // right align
+        if(left < 8) left = 8;
+        const maxLeft = window.innerWidth - mw - 8;
+        if(left > maxLeft) left = maxLeft;
+        menu.style.top = (r.bottom + 6) + 'px';
+        menu.style.left = left + 'px';
+      }
+      function open(){ menu.classList.remove('hidden'); position(); }
+      function close(){ menu.classList.add('hidden'); }
+      btn.addEventListener('click', e=>{ e.stopPropagation(); menu.classList.contains('hidden') ? open() : close(); });
+      menu.addEventListener('click', e=> e.stopPropagation());
+      document.addEventListener('click', close);
+      window.addEventListener('resize', position);
+      window.addEventListener('scroll', position, true);
+    })();
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

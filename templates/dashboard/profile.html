@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}Profile · Roles{% endblock %}
+{% block header %}Profile{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+  
+  <!-- User Profile Card -->
+  <div class="card">
+    <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+      <!-- Avatar -->
+      <div class="flex-shrink-0">
+        <div class="w-24 h-24 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg">
+          {% if oidc_user_picture %}
+            <img src="{{ oidc_user_picture }}" alt="Profile Picture" class="w-full h-full object-cover rounded-xl" referrerpolicy="no-referrer" />
+          {% else %}
+            <span class="text-3xl font-bold text-white">{{ request.user.username|default:'?'|slice:':1'|upper }}</span>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- User Info -->
+      <div class="flex-1 min-w-0">
+        <h1 class="text-2xl font-bold text-white mb-2">{{ request.user.get_full_name|default:request.user.username }}</h1>
+        <p class="text-slate-400 mb-4">{{ request.user.email }}</p>
+        
+        <!-- Roles -->
+        <div class="mb-4">
+          <h3 class="text-sm font-medium text-slate-300 mb-2">Roles</h3>
+          <div class="flex flex-wrap gap-2">
+            {% if user_roles %}
+              {% for role in user_roles %}
+                <span class="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-sm border border-cyan-400/20">
+                  {{ role }}
+                </span>
+              {% endfor %}
+            {% else %}
+              <span class="px-3 py-1 rounded-full bg-slate-700/50 text-slate-400 text-sm">No roles assigned</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Logout Button -->
+      <div class="flex-shrink-0">
+        <form method="post" action="/logout/">
+          {% csrf_token %}
+          <button type="submit" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors">
+            Sign Out
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Claims Section -->
+  <div class="card">
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-white mb-2">ID Token Claims</h2>
+      <p class="text-slate-400">Identity information from your authentication token</p>
+    </div>
+    
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-white/10">
+            <th class="text-left py-3 px-4 text-sm font-medium text-slate-300">Claim</th>
+            <th class="text-left py-3 px-4 text-sm font-medium text-slate-300">Value</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5">
+          {% for key, value in id_claims.items %}
+            <tr class="hover:bg-white/5">
+              <td class="py-3 px-4 text-sm font-mono text-slate-300">{{ key }}</td>
+              <td class="py-3 px-4 text-sm text-slate-400">
+                {% if value|add:"0" == value %}
+                  <!-- It's a number -->
+                  <span class="break-all">{{ value }}</span>
+                {% elif value.items %}
+                  <!-- It's a dictionary/object -->
+                  <details class="cursor-pointer">
+                    <summary class="text-cyan-300 hover:text-cyan-200">View data</summary>
+                    <pre class="mt-2 p-3 bg-slate-800 rounded text-xs overflow-auto max-h-32">{{ value|pprint }}</pre>
+                  </details>
+                {% elif value|stringformat:"s" == value %}
+                  <!-- It's a string -->
+                  <span class="break-all">{{ value }}</span>
+                {% else %}
+                  <!-- It's a list/array -->
+                  <div class="flex flex-wrap gap-1">
+                    {% for item in value %}
+                      <span class="px-2 py-1 bg-slate-800 rounded text-xs">{{ item }}</span>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="2" class="py-8 text-center text-slate-500">No claims available</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

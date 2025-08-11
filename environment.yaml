@@ -1,0 +1,15 @@
+name: django-roles
+channels:
+- https://conda.anaconda.org/conda-forge
+dependencies:
+- django=5.2
+- django-browser-reload=1.18
+- django-extensions=4.1
+- mozilla-django-oidc=4.0
+- nodejs=24
+- pyopenssl=25.1
+- python=3.10
+- python-dotenv=1.1
+- rules=3.5
+- werkzeug=3.1
+- whitenoise=6.7

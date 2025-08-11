@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Trade · Roles{% endblock %}
+{% block header %}{{ action }} Trade{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+
+  <!-- Form Header -->
+  <div class="card">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center shadow-lg">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold text-white">{{ action }} Trade</h1>
+        <p class="text-slate-400">Enter trade details below</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trade Form -->
+  <div class="card">
+    <form method="post" class="space-y-6">
+      {% csrf_token %}
+      
+      <!-- Symbol -->
+      <div>
+        <label for="{{ form.symbol.id_for_label }}" class="block text-sm font-medium text-slate-300 mb-2">
+          Trading Symbol
+        </label>
+        {{ form.symbol }}
+        {% if form.symbol.errors %}
+          <div class="mt-1 text-sm text-red-400">
+            {% for error in form.symbol.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+        <p class="mt-1 text-xs text-slate-500">e.g., AAPL, MSFT, GOOGL</p>
+      </div>
+
+      <!-- Trade Type -->
+      <div>
+        <label for="{{ form.trade_type.id_for_label }}" class="block text-sm font-medium text-slate-300 mb-2">
+          Trade Type
+        </label>
+        {{ form.trade_type }}
+        {% if form.trade_type.errors %}
+          <div class="mt-1 text-sm text-red-400">
+            {% for error in form.trade_type.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Quantity and Price Row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Quantity -->
+        <div>
+          <label for="{{ form.quantity.id_for_label }}" class="block text-sm font-medium text-slate-300 mb-2">
+            Quantity
+          </label>
+          {{ form.quantity }}
+          {% if form.quantity.errors %}
+            <div class="mt-1 text-sm text-red-400">
+              {% for error in form.quantity.errors %}{{ error }}{% endfor %}
+            </div>
+          {% endif %}
+          <p class="mt-1 text-xs text-slate-500">Number of shares</p>
+        </div>
+
+        <!-- Price -->
+        <div>
+          <label for="{{ form.price.id_for_label }}" class="block text-sm font-medium text-slate-300 mb-2">
+            Price per Share
+          </label>
+          {{ form.price }}
+          {% if form.price.errors %}
+            <div class="mt-1 text-sm text-red-400">
+              {% for error in form.price.errors %}{{ error }}{% endfor %}
+            </div>
+          {% endif %}
+          <p class="mt-1 text-xs text-slate-500">USD</p>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div>
+        <label for="{{ form.notes.id_for_label }}" class="block text-sm font-medium text-slate-300 mb-2">
+          Notes
+        </label>
+        {{ form.notes }}
+        {% if form.notes.errors %}
+          <div class="mt-1 text-sm text-red-400">
+            {% for error in form.notes.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+        <p class="mt-1 text-xs text-slate-500">Optional additional information</p>
+      </div>
+
+      <!-- Trade Value Preview -->
+      <div class="bg-white/5 border border-white/10 rounded-lg p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+            <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm text-slate-400">Total Trade Value</p>
+            <p class="text-lg font-semibold text-white" id="tradeValue">$0.00</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex items-center gap-4 pt-4">
+        <button type="submit" class="flex-1 px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-medium transition-colors">
+          {{ action }} Trade
+        </button>
+        <a href="{% url 'dashboard:trades' %}" class="px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-lg font-medium transition-colors">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<script>
+// Calculate trade value in real-time
+function updateTradeValue() {
+  const quantity = document.getElementById('{{ form.quantity.id_for_label }}').value || 0;
+  const price = document.getElementById('{{ form.price.id_for_label }}').value || 0;
+  const total = parseFloat(quantity) * parseFloat(price);
+  document.getElementById('tradeValue').textContent = '$' + total.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+// Add event listeners
+document.getElementById('{{ form.quantity.id_for_label }}').addEventListener('input', updateTradeValue);
+document.getElementById('{{ form.price.id_for_label }}').addEventListener('input', updateTradeValue);
+
+// Initial calculation
+updateTradeValue();
+</script>
+{% endblock %}

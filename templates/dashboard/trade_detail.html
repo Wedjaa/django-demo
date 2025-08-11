@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+{% block title %}Trade {{ trade.symbol }} · Roles{% endblock %}
+{% block header %}Trade Details{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+
+  <!-- Trade Header -->
+  <div class="card">
+    <div class="flex flex-col md:flex-row md:items-center gap-4 justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center shadow-lg">
+          {% if trade.trade_type == 'BUY' %}
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+          {% else %}
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+            </svg>
+          {% endif %}
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-white">{{ trade.symbol }} {{ trade.trade_type }}</h1>
+          <p class="text-slate-400">{{ trade.quantity|floatformat:0 }} shares @ ${{ trade.price|floatformat:2 }}</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <span class="px-4 py-2 rounded-full bg-{{ trade.status_color }}-500/20 text-{{ trade.status_color }}-300 font-medium">
+          {{ trade.status }}
+        </span>
+        {% if can_confirm %}
+        <a href="{% url 'dashboard:trade_confirm' trade.id %}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+          Confirm
+        </a>
+        {% endif %}
+        {% if can_approve %}
+        <a href="{% url 'dashboard:trade_approve' trade.id %}" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors">
+          Approve
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+    <!-- Trade Details -->
+    <div class="lg:col-span-2 space-y-6">
+      
+      <!-- Basic Information -->
+      <div class="card">
+        <h3 class="text-lg font-medium text-white mb-4">Trade Information</h3>
+        <div class="grid grid-cols-2 gap-6">
+          <div>
+            <p class="text-sm text-slate-400 mb-1">Trading Symbol</p>
+            <p class="text-xl font-bold text-white">{{ trade.symbol }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-slate-400 mb-1">Trade Type</p>
+            <span class="inline-block px-3 py-1 rounded-lg text-lg font-medium {% if trade.trade_type == 'BUY' %}bg-green-500/20 text-green-300{% else %}bg-red-500/20 text-red-300{% endif %}">
+              {{ trade.trade_type }}
+            </span>
+          </div>
+          <div>
+            <p class="text-sm text-slate-400 mb-1">Quantity</p>
+            <p class="text-xl font-bold text-white">{{ trade.quantity|floatformat:0 }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-slate-400 mb-1">Price per Share</p>
+            <p class="text-xl font-bold text-white">${{ trade.price|floatformat:2 }}</p>
+          </div>
+        </div>
+        
+        <div class="mt-6 pt-6 border-t border-white/10">
+          <div class="flex items-center justify-between">
+            <p class="text-lg text-slate-400">Total Trade Value</p>
+            <p class="text-2xl font-bold text-white">${{ trade.total_value|floatformat:2 }}</p>
+          </div>
+        </div>
+
+        {% if trade.notes %}
+        <div class="mt-6 pt-6 border-t border-white/10">
+          <p class="text-sm text-slate-400 mb-2">Notes</p>
+          <p class="text-white">{{ trade.notes }}</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Trade Timeline -->
+      <div class="card">
+        <h3 class="text-lg font-medium text-white mb-4">Trade Timeline</h3>
+        <div class="space-y-4">
+          <!-- Created -->
+          <div class="flex items-start gap-4">
+            <div class="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center mt-1">
+              <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <p class="font-medium text-white">Trade Created</p>
+                <span class="text-sm text-slate-400">{{ trade.created_at|date:"M d, Y H:i" }}</span>
+              </div>
+              <p class="text-sm text-slate-400 mt-1">Created by {{ trade.created_by.username }}</p>
+            </div>
+          </div>
+
+          <!-- Confirmed -->
+          {% if trade.confirmed_by %}
+          <div class="flex items-start gap-4">
+            <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center mt-1">
+              <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <p class="font-medium text-white">Trade Confirmed</p>
+                <span class="text-sm text-slate-400">{{ trade.confirmed_at|date:"M d, Y H:i" }}</span>
+              </div>
+              <p class="text-sm text-slate-400 mt-1">Confirmed by {{ trade.confirmed_by.username }}</p>
+            </div>
+          </div>
+          {% elif trade.status == 'PENDING' %}
+          <div class="flex items-start gap-4">
+            <div class="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center mt-1">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <p class="font-medium text-slate-400">Awaiting Confirmation</p>
+              <p class="text-sm text-slate-500 mt-1">Requires user with 'confirm' role</p>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Approved -->
+          {% if trade.approved_by %}
+          <div class="flex items-start gap-4">
+            <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center mt-1">
+              <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <p class="font-medium text-white">Trade Approved</p>
+                <span class="text-sm text-slate-400">{{ trade.approved_at|date:"M d, Y H:i" }}</span>
+              </div>
+              <p class="text-sm text-slate-400 mt-1">Approved by {{ trade.approved_by.username }}</p>
+            </div>
+          </div>
+          {% elif trade.status == 'CONFIRMED' %}
+          <div class="flex items-start gap-4">
+            <div class="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center mt-1">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <p class="font-medium text-slate-400">Awaiting Approval</p>
+              <p class="text-sm text-slate-500 mt-1">Requires user with 'approver' role</p>
+            </div>
+          </div>
+          {% elif trade.status == 'REJECTED' %}
+          <div class="flex items-start gap-4">
+            <div class="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center mt-1">
+              <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <p class="font-medium text-white">Trade Rejected</p>
+              <p class="text-sm text-slate-400 mt-1">This trade has been rejected</p>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      
+      <!-- Quick Actions -->
+      <div class="card">
+        <h3 class="text-lg font-medium text-white mb-4">Actions</h3>
+        <div class="space-y-3">
+          {% if can_confirm %}
+          <a href="{% url 'dashboard:trade_confirm' trade.id %}" class="w-full flex items-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Confirm Trade
+          </a>
+          {% endif %}
+          {% if can_approve %}
+          <a href="{% url 'dashboard:trade_approve' trade.id %}" class="w-full flex items-center gap-2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            Approve Trade
+          </a>
+          {% endif %}
+          <a href="{% url 'dashboard:trades' %}" class="w-full flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-lg font-medium transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Trades
+          </a>
+        </div>
+      </div>
+
+      <!-- Your Permissions -->
+      <div class="card">
+        <h3 class="text-lg font-medium text-white mb-4">Your Permissions</h3>
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span class="text-sm text-slate-300">View Trades</span>
+          </div>
+          {% if 'admin' in user_roles %}
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span class="text-sm text-slate-300">Create Trades</span>
+          </div>
+          {% endif %}
+          {% if 'confirm' in user_roles %}
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span class="text-sm text-slate-300">Confirm Trades</span>
+          </div>
+          {% endif %}
+          {% if 'approver' in user_roles %}
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span class="text-sm text-slate-300">Approve Trades</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
