@@ -11,7 +11,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-key")
 DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+
+USE_X_FORWARDED_HOST = True
+ALLOWED_HOSTS = [ 
+    "localhost", 
+    "127.0.0.1",
+    f"{os.environ.get('CODESPACE_NAME', '')}-8000.app.github.dev", 
+]
+
+ALLOWED_HOSTS += os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",")
 
 INSTALLED_APPS = [
     "django_extensions",
